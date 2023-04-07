@@ -1,0 +1,118 @@
+plugins {
+    id "nebula.release" version "15.3.1"
+    id "maven-publish"
+    id "java-library"
+    id "idea"
+    id "com.google.protobuf" version "0.8.13"
+    id "org.jetbrains.kotlin.jvm" version "1.5.10"
+    id 'signing'
+}
+
+sourceSets {
+    getByName("main").java.srcDirs("/src/generated/")
+}
+
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation(grpc.bundles.javax)
+    api(grpc.bundles.core)
+    compileOnly(grpc.bundles.kotlin)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+group = "io.github.maximgorbunov"
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.17.3"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.44.0"
+        }
+        grpckt {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.1.0:jdk7@jar"
+        }
+    }
+    generateProtoTasks {
+        ofSourceSet("main").forEach {
+            it.plugins {
+                grpc {}
+                grpckt {}
+            }
+        }
+    }
+    generatedFilesBaseDir = "$projectDir/src/generated"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "tinkoff-grpc"
+            pom {
+                name = 'Tinkoff gRPC stubs'
+                description = 'Tinkoff gRPC stubs'
+                url = 'https://github.com/MaximGorbunov/tinkoff-grpc'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'mgorbunov'
+                        name = 'Maxim Gorbunov'
+                        email = 'maxgorbunov01@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git@github.com:MaximGorbunov/tinkoff-grpc.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:MaximGorbunov/tinkoff-grpc.git'
+                    url = 'https://github.com/MaximGorbunov/tinkoff-grpc'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications["mavenJava"]
+}
+
+tasks.named("release") {
+    dependsOn("signMavenJavaPublication")
+    finalizedBy("publish")
+}
