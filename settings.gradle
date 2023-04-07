@@ -6,7 +6,7 @@ enableFeaturePreview('VERSION_CATALOGS')
 dependencyResolutionManagement {
     versionCatalogs {
         grpc {
-            version('grpc', '1.38.1')
+            version('grpc', '1.44.0')
             version('grpcKotlin', '1.1.0')
             version('protobuf', '3.17.3')
 
