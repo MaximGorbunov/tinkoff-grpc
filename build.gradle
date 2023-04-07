@@ -68,10 +68,16 @@ protobuf {
     generatedFilesBaseDir = "$projectDir/src/generated"
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId = "tinkoff-grpc"
+            from(components["java"])
             pom {
                 name = 'Tinkoff gRPC stubs'
                 description = 'Tinkoff gRPC stubs'
