@@ -1,4 +1,4 @@
-rootProject.name = "tinkoff-proto"
+rootProject.name = "tinkoff-grpc"
 
 
 enableFeaturePreview('VERSION_CATALOGS')

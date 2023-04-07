@@ -27,7 +27,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-group = "cf.mgorbunov"
+group = "io.github.maximgorbunov"
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:3.17.3"
@@ -71,8 +71,14 @@ publishing {
             from(components["java"])
             artifactId = "${name}"
         }
-    }
-    repositories {
-        mavenLocal()
+        repositories {
+            maven {
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = System.getenv("MAVEN_USERNAME")
+                    password = System.getenv("MAVEN_PASSWORD")
+                }
+            }
+        }
     }
 }

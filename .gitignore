@@ -8,6 +8,7 @@
 # BlueJ files
 *.ctxt
 
+.idea/
 src/generated
 
 # Mobile Tools for Java (J2ME)
